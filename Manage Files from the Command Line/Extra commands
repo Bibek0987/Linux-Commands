@@ -1,0 +1,70 @@
+ADVANCED & EXTRA FILE MANAGEMENT COMMANDS
+# 1. Create a file with content directly
+echo "Hello World" > file.txt
+
+
+Use: Quickly create config files, scripts, notes.
+
+# 2. Append (add text) to a file
+echo "New line" >> file.txt
+Adds text without replacing old content.
+
+# 3. Create multiple files at once
+touch file1.txt file2.txt file3.txt
+
+# 4. Create multiple numbered files
+touch log_{1..10}.txt
+Creates:
+
+log_1.txt
+log_2.txt
+...
+log_10.txt
+Useful for testing.
+
+# 5. Copy only newer files
+cp -u source/ dest/
+Prevents overwriting newer files.
+
+# 6. Show the top 20 lines
+head -20 file.txt
+
+# 7. Show last 20 lines
+tail -20 file.txt
+
+# 8. Monitor a file in real-time (LIVE LOGS)
+tail -f /var/log/messages
+
+# 9. Count lines, words, characters
+wc file.txt
+
+Or individually:
+
+wc -l file.txt   # lines
+wc -w file.txt   # words
+wc -c file.txt   # characters
+
+# 10. Compare two files
+diff file1.txt file2.txt
+Shows differences — useful for config changes.
+
+# 11. Compress a folder
+tar -czvf backup.tar.gz foldername/
+
+# 12. Extract a tar file
+tar -xzvf backup.tar.gz
+
+# 13. Delete files older than 7 days
+find /tmp -type f -mtime +7 -delete
+
+
+Real world: clean old logs.
+
+# 14. Find and move files
+find . -name "*.log" -exec mv {} logs/ \;
+
+
+Moves all .log files to logs folder.
+
+# 15. Copy file permissions from one file to another
+chmod --reference=config1.yaml config2.yaml
