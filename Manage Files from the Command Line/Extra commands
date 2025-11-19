@@ -68,3 +68,61 @@ Moves all .log files to logs folder.
 
 # 15. Copy file permissions from one file to another
 chmod --reference=config1.yaml config2.yaml
+
+=====>> EXTRA POWER COMMANDS YOU WON’T FIND IN BASICS <<===============
+⭐ 16. Show file sizes in human readable format
+du -sh *
+
+
+Useful to check which folder is heavy.
+
+⭐ 17. Show biggest files in current directory
+du -sh * | sort -hr | head
+
+⭐ 18. Show disk usage
+df -h
+
+⭐ 19. Find large files above 1 GB
+find / -type f -size +1G
+
+⭐ 20. Rename multiple files together
+rename 's/.txt/.bak/' *.txt
+
+
+Changes .txt → .bak
+
+⭐ 21. Show last modified times
+stat file.txt
+
+⭐ 22. Secure delete a file
+shred -u secret.txt
+
+
+Overwrites file so recovery is impossible.
+
+⭐ 23. Search multiple keywords in file
+grep -E "error|fail|critical" app.log
+
+⭐ 24. Copy files across servers
+scp file.txt user@server:/path/
+
+⭐ 25. Sync folders (backup/production mirroring)
+rsync -avz source/ destination/
+
+⭐ 26. Move everything EXCEPT certain files
+rsync -av --exclude="*.png" ./ /backup/
+
+⭐ 27. Check file type
+file unknownfile
+
+
+Shows whether it's binary, text, script, etc.
+
+⭐ 28. View file permissions in numeric format
+stat -c "%a %n" *
+
+⭐ 29. Open file with default application
+xdg-open file.pdf
+
+⭐ 30. Give temporary sudo permission to edit a system file
+sudo -E vim /etc/hosts
