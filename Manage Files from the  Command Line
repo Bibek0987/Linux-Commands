@@ -1,1 +1,150 @@
+1. Create a file
+touch file.txt
+Creates an empty file.
 
+📌 2. Create a directory
+mkdir project
+Creates a folder named project.
+
+📌 3. Create nested directories
+mkdir -p dev/app/config
+-p creates parent folders if not present.
+
+📌 4. List files
+ls
+ls -l
+ls -la
+-l: long view
+-a: show hidden files
+
+📌 5. View file content
+cat file.txt
+Prints complete file.
+
+📌 6. View content page by page
+less file.txt
+Useful for long files.
+
+📌 7. Edit file (CLI editor)
+nano file.txt
+Simple text editor.
+
+📌 8. Copy file
+cp file.txt backup.txt
+
+📌 9. Copy directory
+cp -r project/ project_backup/
+-r = recursive (copy folders).
+
+📌 10. Move or rename
+mv file.txt newname.txt
+mv file.txt /tmp/
+
+📌 11. Delete files
+rm file.txt
+
+📌 12. Delete directory
+rm -r project/
+Or safe delete:
+rm -ri project/
+-i: asks before deleting.
+
+📌 13. Find a file
+find . -name "file.txt"
+
+📌 14. Search text inside a file
+grep "error" logfile.txt
+
+📌 15. Check file permissions
+ls -l file.txt
+
+📌 16. Change permissions
+chmod 644 file.txt
+chmod +x script.sh
+
+📌 17. Change ownership
+sudo chown user:user file.txt
+
+🔵 2. Real-Time Scenarios (with practical commands)
+Scenario 1: Create a project structure
+
+You want to create a folder structure for a DevOps project:
+
+mkdir -p devops/{ansible,terraform,kubernetes,scripts}
+Creates all folders at once.
+
+Scenario 2: Backup configuration files
+cp /etc/ssh/sshd_config sshd_config.bak
+Takes a quick backup.
+
+Scenario 3: Find all log files larger than 100 MB
+find /var/log -type f -size +100M
+
+Scenario 4: Fix error by changing script permission
+Script not running?
+bash: ./deploy.sh: Permission denied
+
+
+Fix:
+chmod +x deploy.sh
+
+Scenario 5: Clean old logs
+rm -rf /var/log/*.gz
+
+Scenario 6: Move all YAML files to a folder
+mv *.yaml configs/
+
+Scenario 7: Debug a microservice log in real-time
+tail -f app.log
+
+Scenario 8: Search for errors inside a log file
+grep -i "error" app.log
+
+🔵 3. Common Issues & Solutions (with commands)
+❌ Issue: “Permission denied” while editing a system file
+✔️ Solution:
+
+Use sudo:
+sudo nano /etc/fstab
+
+❌ Issue: Can’t remove directory — “Directory not empty”
+✔️ Solution:
+rm -rf foldername/
+
+❌ Issue: Wrong file permissions causing service failure
+Example error:
+Failed to read config: permission denied
+
+✔️ Solution:
+chmod 644 config.yaml
+
+❌ Issue: File not found even though it exists
+You are in the wrong directory.
+
+✔️ Solution:
+Check current directory:
+pwd
+
+List files:
+ls -l
+
+❌ Issue: Script cannot execute
+-bash: script.sh: command not found
+
+✔️ Solutions:
+Add execute permission:
+chmod +x script.sh
+
+
+Run with path:
+./script.sh
+
+🔵 4. Bonus: Frequently Used Shortcuts
+Copy the previous command:
+!!
+
+Go to previous directory:
+cd -
+
+Clear screen:
+clear
