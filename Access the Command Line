@@ -1,0 +1,11 @@
+File and Directory Management :-
+Command	                                            Description	                                                 Example
+ls	                                        List directory contents	                                         ls -l (long format)
+cd	                                        Change directory	                                               cd /home/user/Documents
+pwd                                       	Show current directory                                                	pwd
+mkdir                                      	Create a directory	                                             mkdir new_folder
+rm	                                        Remove files/directories	                                       rm file.txt, rm -r folder/
+cp	                                        Copy files/directories	                                         cp file1.txt file2.txt, cp -r dir1/ dir2/
+mv	                                        Move or rename files	                                          mv old.txt new.txt, mv file.txt /path/to/dest/
+touch	                                      Create an empty file	                                          touch newfile.txt
+find	                                     Search for files/directories	                                    find . -name "*.txt" 
