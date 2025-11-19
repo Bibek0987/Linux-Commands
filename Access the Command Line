@@ -1,11 +1,36 @@
-File and Directory Management :-
-Command	                                            Description	                                                 Example
-ls	                                        List directory contents	                                         ls -l (long format)
-cd	                                        Change directory	                                               cd /home/user/Documents
-pwd                                       	Show current directory                                                	pwd
-mkdir                                      	Create a directory	                                             mkdir new_folder
-rm	                                        Remove files/directories	                                       rm file.txt, rm -r folder/
-cp	                                        Copy files/directories	                                         cp file1.txt file2.txt, cp -r dir1/ dir2/
-mv	                                        Move or rename files	                                          mv old.txt new.txt, mv file.txt /path/to/dest/
-touch	                                      Create an empty file	                                          touch newfile.txt
-find	                                     Search for files/directories	                                    find . -name "*.txt" 
+# [user@host ~]$ whoami 
+ user
+# [user@host ~]$ command1 ; command2
+ command1 output
+ command2 output
+#  [user@host ~]$ date
+ Sun Feb 27 08:32:42 PM EST 2022
+# [user@host ~]$ date +%R
+ 20:33
+# [user@host ~]$ date +%x
+ 02/27/2022
+
+# [user@host ~]$ passwd
+ Changing password for user user.
+ Current password: old_password
+ New password: new_password
+ Retype new password: new_password
+ passwd: all authentication tokens updated successfully
+
+#  file /etc/passwd
+ /etc/passwd: ASCII text   (file name extensions to classify files by type)
+
+# cat /etc/passwd ( View the Contents of Files)
+# [user@host ~]$ head /etc/passwd  ( The head and tail commands display the beginning and the end of a file)
+# [user@host ~]$ tail -n 3 /etc/passwd
+
+#  [user@host ~]$ wc /etc/passwd   (  Use the -l, -w, or -c options to display only the given number of lines, words, or characters )
+ 41   98 2338 /etc/passwd
+# [user@host ~]$ wc -l /etc/passwd ; wc -l /etc/group
+ 41 /etc/passwd
+ 63 /etc/group
+# [user@host ~]$ wc -c /etc/group /etc/hosts
+ 883 /etc/group
+ 114 /etc/hosts
+ 997 total
+
