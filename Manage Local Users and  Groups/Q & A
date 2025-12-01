@@ -1,0 +1,54 @@
+1️⃣ What is UID and GID?
+
+Answer:
+UID = User ID
+GID = Group ID
+They uniquely identify users and groups on the system.
+
+2️⃣ What is the difference between useradd & adduser?
+
+Answer:
+
+useradd → low-level command (default on all Linux)
+
+adduser → high-level interactive script (Debian/Ubuntu)
+
+3️⃣ How do you add a user to multiple groups?
+sudo usermod -aG group1,group2,group3 username
+
+4️⃣ What is /etc/passwd used for?
+
+Answer:
+Stores user account info such as username, UID, GID, shell.
+
+5️⃣ What is /etc/shadow used for?
+
+Answer:
+Stores password hashes and password expiry details (secure).
+
+6️⃣ How do you check user password expiry?
+chage -l username
+
+7️⃣ How do you lock/unlock a user account?
+
+Lock:
+
+passwd -l username
+
+
+Unlock:
+
+passwd -u username
+
+8️⃣ How do you delete a user with home directory?
+userdel -r username
+
+9️⃣ What is a primary and secondary group?
+
+Primary group → created when a user is created
+
+Secondary groups → additional groups for privileges
+
+🔟 How do you create a group and assign a user to it?
+groupadd dev
+usermod -aG dev username
