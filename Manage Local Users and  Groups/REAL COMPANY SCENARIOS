@@ -1,0 +1,183 @@
+1: Give a developer team access to a project directory
+Business Requirement
+
+A new team devteam needs access to:
+
+/opt/projects/app1
+
+
+But they should NOT have sudo access.
+
+Solution
+1. Create group
+sudo groupadd devteam
+
+2. Add users to group
+sudo usermod -aG devteam john
+sudo usermod -aG devteam maria
+
+3. Change directory group
+sudo chown -R root:devteam /opt/projects/app1
+
+4. Give group read/write/execute
+sudo chmod -R 770 /opt/projects/app1
+
+Explanation
+
+Group members can work together without affecting other users.
+
+🟩 Scenario 2: Employee left the company — disable account immediately
+Business Requirement
+
+User alex resigned. Disable access without deleting data.
+
+Commands
+1. Lock account
+sudo passwd -l alex
+
+2. Kill all active sessions
+sudo pkill -u alex
+
+3. Verify account locked
+sudo passwd -S alex
+
+Explanation
+
+You lock but do not delete the account so files remain safe for auditing.
+
+🟥 Scenario 3: Grant temporary sudo access for maintenance
+Business Requirement
+
+User rajesh needs sudo access for 2 days.
+
+Commands
+1. Add user to sudo group
+sudo usermod -aG wheel rajesh   # RHEL
+sudo usermod -aG sudo rajesh    # Ubuntu
+
+2. Remove sudo access after 2 days
+sudo gpasswd -d rajesh wheel
+
+Explanation
+
+Temporary privilege elevation is common in production.
+
+🟨 Scenario 4: Secure password policy for all users
+Business Requirement
+
+Company security demands:
+
+Password expires every 90 days
+
+Warn user 7 days before expiry
+
+Lock account if password not changed in 30 days
+
+Command
+sudo chage -M 90 -W 7 -I 30 username
+
+To apply for all users:
+
+Edit /etc/login.defs:
+
+PASS_MAX_DAYS   90
+PASS_WARN_AGE    7
+PASS_INACTIVE   30
+
+🟦 Scenario 5: Create service accounts for applications
+Business Requirement
+
+Application jenkins, prometheus, nginx require non-login system users.
+
+Command
+sudo useradd --system --no-create-home --shell /sbin/nologin jenkins
+sudo useradd --system --no-create-home --shell /sbin/nologin prometheus
+sudo useradd --system --no-create-home --shell /sbin/nologin nginx
+
+Explanation
+
+Service accounts reduce security risks and follow DevSecOps standards.
+
+🟪 Scenario 6: Restrict a user to only SFTP (no SSH)
+Business Requirement
+
+Vendor needs file upload access, but must NOT get SSH login.
+
+Command
+sudo useradd -m vendor1
+sudo passwd vendor1
+sudo usermod -s /usr/sbin/nologin vendor1
+
+
+Configure SFTP jail in sshd config (if required).
+
+🟧 Scenario 7: Fix “Permission denied” for developers on shared directory
+Problem
+
+Developers cannot write inside:
+
+/opt/shared
+
+Fix
+
+Set group sticky bit:
+
+sudo chown -R root:devteam /opt/shared
+sudo chmod 2775 /opt/shared
+
+Explanation
+
+2 sets SGID, meaning new files inherit the group automatically.
+
+🔵 Scenario 8: Move user data to another partition
+Business Requirement
+
+DevOps team migrates home directories to /mnt/data/home.
+
+Commands
+1. Create new directory:
+sudo mkdir -p /mnt/data/home/rahul
+
+2. Move old data:
+sudo rsync -av /home/rahul/ /mnt/data/home/rahul/
+
+3. Update user home path:
+sudo usermod -d /mnt/data/home/rahul rahul
+
+🔴 Scenario 9: A user forgot password (Managers ask for fix)
+Command
+sudo passwd username
+
+If user is locked:
+sudo passwd -u username
+
+🟢 Scenario 10: Allow only specific users to run a script
+Business Requirement
+
+Only the backup group can run /usr/local/bin/backup.sh.
+
+Commands
+sudo groupadd backup
+sudo usermod -aG backup john
+sudo usermod -aG backup anil
+sudo chown root:backup /usr/local/bin/backup.sh
+sudo chmod 750 /usr/local/bin/backup.sh
+
+🔥 BONUS: Interview-Type Scenarios (Highly Asked)
+Q1: How do you create a user who must reset password on first login?
+sudo passwd username
+sudo passwd -e username
+
+Q2: Create a user with UID 1200, home directory, and bash shell
+sudo useradd -u 1200 -m -s /bin/bash devuser
+sudo passwd devuser
+
+Q3: Create a user and add them to a new group in a single command
+sudo useradd -m -G docker bibek
+
+Q4: How to check if a user’s account is locked?
+sudo passwd -S username
+
+Q5: Create a group and change ownership of a directory
+sudo groupadd testing
+sudo chown -R root:testing /opt/testing
