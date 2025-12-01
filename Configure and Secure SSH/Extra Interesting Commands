@@ -1,0 +1,246 @@
+1-Page SSH Interview Cheat Sheet
+🔹 SSH Basics
+Port: 22 (default)
+Config file (server): /etc/ssh/sshd_config
+Config file (client): ~/.ssh/config
+Key files: ~/.ssh/id_rsa, id_rsa.pub
+Known hosts: ~/.ssh/known_hosts
+
+🔹 Start/Enable SSH
+systemctl start sshd
+systemctl enable sshd
+systemctl status sshd
+
+🔹 Connect to Server
+ssh user@server-ip
+ssh -p 2222 user@server-ip
+ssh -i ~/.ssh/mykey user@server-ip
+
+🔹 Generate SSH Key
+ssh-keygen -t rsa -b 4096
+ssh-copy-id user@server-ip
+
+🔹 Verify SSH Issues
+ssh -vvv user@server-ip
+tail -f /var/log/secure       # RHEL
+tail -f /var/log/auth.log    # Ubuntu
+
+🔹 Secure SSH (Most Asked in Interview)
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+AllowUsers devops admin
+Port 2222
+UseDNS no
+
+🔹 Permissions
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
+🔹 Firewall
+firewall-cmd --add-port=2222/tcp --permanent
+firewall-cmd --reload
+
+🔹 Fail2Ban
+yum install fail2ban -y
+systemctl enable fail2ban
+
+🟩 ✔ SSH Lab Tasks (Hands-On Practice for Real Jobs)
+
+These are the same tasks given to DevOps/Linux interns and freshers in companies.
+
+🧪 Task 1: Install & Start SSH
+sudo yum install openssh-server -y
+sudo systemctl enable --now sshd
+
+🧪 Task 2: Create a user and allow SSH
+useradd devops
+passwd devops
+
+
+Enable user:
+
+AllowUsers devops
+
+
+Restart:
+
+systemctl restart sshd
+
+🧪 Task 3: Set Up Key-Based Authentication
+ssh-keygen -t rsa -b 4096
+ssh-copy-id devops@server-ip
+
+
+Disable passwords:
+
+PasswordAuthentication no
+
+🧪 Task 4: Change SSH Port
+Port 2222
+
+
+Enable in firewall:
+
+firewall-cmd --add-port=2222/tcp --permanent
+firewall-cmd --reload
+
+🧪 Task 5: Restrict SSH Access to Specific IP
+firewall-cmd --add-rich-rule='rule family="ipv4" \
+source address="10.0.0.5" accept' --permanent
+firewall-cmd --reload
+
+🧪 Task 6: Block Users After Failed Logins (Fail2Ban)
+
+Install:
+
+sudo yum install fail2ban -y
+
+
+Enable:
+
+systemctl enable --now fail2ban
+
+🧪 Task 7: Fix a Broken SSH Server
+
+Scenario: SSH not working.
+
+Steps:
+
+systemctl status sshd
+journalctl -xe
+ss -tulnp | grep 22
+firewall-cmd --list-all
+
+🟥 ✔ SSH Hardening Checklist (Used in Real Companies)
+
+This is exactly what SysAdmins/DevOps engineers use in enterprises.
+
+🔒 1. Disable Root Login
+PermitRootLogin no
+
+🔒 2. Disable Password Login
+PasswordAuthentication no
+
+
+(After confirming key-based login works)
+
+🔒 3. Change Default Port
+Port 2222
+
+🔒 4. Allow Only Specific Users/Groups
+AllowUsers devops admin
+AllowGroups sshusers
+
+🔒 5. Use Strong SSH Keys
+ssh-keygen -t rsa -b 4096
+
+
+Or stronger:
+
+ssh-keygen -t ed25519
+
+🔒 6. Restrict Access by IP
+
+Firewall:
+
+firewall-cmd --add-rich-rule
+
+
+TCP Wrappers:
+
+/etc/hosts.allow
+/etc/hosts.deny
+
+🔒 7. Disable Unused Authentication
+ChallengeResponseAuthentication no
+GSSAPIAuthentication no
+
+🔒 8. Limit Idle Sessions
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+🔒 9. Enable Logging
+LogLevel VERBOSE
+
+🔒 10. Install Fail2Ban
+
+Blocks brute-force attacks
+
+Auto bans suspicious IPs
+
+Logs everything
+
+🟦 Bonus: TOP SSH Interview Questions + Answers
+Q1: How do you secure SSH on a production server?
+
+A:
+
+Disable root login
+
+Disable password login
+
+Use key-based authentication
+
+Change port
+
+Allow specific users
+
+Enable firewall rules
+
+Install fail2ban
+
+Restrict IP range
+
+Use strong keys
+
+Q2: How do SSH keys work?
+
+A:
+SSH uses public-key cryptography:
+
+Client keeps PRIVATE key
+
+Server stores PUBLIC key in authorized_keys
+
+If they match → login without password.
+
+Q3: What causes “Permission denied (publickey)”?
+
+A:
+
+Wrong permissions
+
+Key missing
+
+Wrong username
+
+Key not copied properly
+
+Fix:
+
+chmod 600 ~/.ssh/authorized_keys
+
+Q4: How to troubleshoot SSH connection?
+
+A:
+
+ssh -vvv user@ip
+tail -f /var/log/secure
+
+Q5: Why disable root login?
+
+A: To prevent brute force attacks on root since it's a known username.
+
+Q6: What is the difference between sshd and ssh?
+
+ssh → client program
+sshd → SSH server daemon
+
+Q7: How do you close idle SSH sessions automatically?
+ClientAliveInterval 300
+ClientAliveCountMax 2
+
+Q8: What is Fail2Ban used for?
+
+Blocks IPs after repeated failed login attempts.
