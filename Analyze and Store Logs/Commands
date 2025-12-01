@@ -1,0 +1,167 @@
+1. Basic Log Analysis Commands (Linux)
+1️⃣ View logs in real-time
+tail -f /var/log/messages
+
+
+Shows new logs as they appear (live debugging).
+
+2️⃣ View last 50 lines from a log
+tail -n 50 /var/log/secure
+
+
+Used for authentication failures, SSH logs.
+
+3️⃣ Search specific keyword
+grep "error" /var/log/messages
+
+
+Finds all lines containing “error”.
+
+4️⃣ Case-insensitive search
+grep -i "failed" /var/log/secure
+
+5️⃣ Search with line numbers
+grep -n "timeout" /var/log/httpd/error_log
+
+6️⃣ View logs page-by-page
+less /var/log/messages
+
+
+Useful for large files.
+
+7️⃣ Monitor file size and growth
+du -sh /var/log/*
+
+
+Find which log file is growing too large.
+
+8️⃣ Find the largest log files
+find /var/log -type f -size +100M
+
+9️⃣ Check logs of systemd services
+journalctl -u httpd
+
+🔟 View today’s logs
+journalctl --since today
+
+🔥 2. Real-Time Scenarios With Commands & Explanation
+Scenario 1: Server CPU is high
+Check process details
+top
+
+Check system logs
+grep -i "cpu" /var/log/messages
+
+Check if any service crashed
+journalctl -xe
+
+Scenario 2: SSH login failure
+Check secure logs
+grep -i "failed" /var/log/secure
+
+Check who logged in
+last
+
+Block attacker IP
+iptables -A INPUT -s <IP> -j DROP
+
+Scenario 3: Disk full because of logs
+Find large logs
+du -sh /var/log/* | sort -h
+
+Clear old logs
+truncate -s 0 /var/log/maillog
+
+Scenario 4: Application not starting
+Check app logs
+journalctl -fu my-app
+
+Check port usage
+ss -tnlp | grep 8080
+
+Check configuration errors
+grep -i error /var/log/myapp/error.log
+
+🔥 3. Real Issues & Solutions (With Commands)
+Issue 1: Log file growing too fast
+Find which file is growing
+ls -lh /var/log
+
+Fix: rotate logs
+
+Edit /etc/logrotate.conf
+
+Issue 2: Permission denied while viewing logs
+Check permissions
+ls -l /var/log/myapp.log
+
+Fix
+sudo chmod 640 /var/log/myapp.log
+sudo chown root:developers /var/log/myapp.log
+
+Issue 3: Systemd logs full
+Check log size
+journalctl --disk-usage
+
+Clear logs
+journalctl --vacuum-size=500M
+
+Issue 4: Application not writing logs
+Check if directory exists
+ls -ld /var/log/myapp
+
+Fix
+sudo mkdir /var/log/myapp
+sudo chmod 755 /var/log/myapp
+
+
+############################------------------------->>>>>>>>>>>>>>>>>>>>>>>>> Real Company Scenario <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<------------------------------###########################
+
+4. Real Company Scenario Examples
+Scenario A: Production Payment Service Down
+Symptoms
+
+API returning 500 errors
+
+Response time high
+
+Commands Used
+tail -f /var/log/payment-service/app.log
+grep -i "timeout" app.log
+journalctl -u payment-service -n 100
+
+Root Cause
+
+Database timeout:
+
+ERROR: Connection to DB timed out after 30s
+
+Fix
+
+Restart DB connection pool.
+
+Scenario B: Company Website Very Slow
+Commands
+grep -i "slow" /var/log/httpd/access_log
+tail -n 200 /var/log/httpd/error_log
+top
+netstat -ntlp
+
+Root cause
+
+Too many connections from one IP.
+
+Fix
+
+Block IP temporarily.
+
+Scenario C: Kubernetes Pod CrashLoopBackOff
+Check logs
+kubectl logs <pod>
+
+Check previous failed logs
+kubectl logs <pod> --previous
+
+Root cause
+
+Misconfigured environment variable.
