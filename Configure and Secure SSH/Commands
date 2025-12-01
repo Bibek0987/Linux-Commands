@@ -1,0 +1,201 @@
+Basic SSH Commands (With Short Explanation)
+✅ Check if SSH is installed
+rpm -qa | grep ssh       # RHEL/CentOS
+dpkg -l | grep ssh        # Ubuntu/Debian
+
+✅ Start/Enable SSH service
+sudo systemctl start sshd
+sudo systemctl enable sshd
+sudo systemctl status sshd
+
+✅ Connect to a remote server
+ssh user@server-ip
+
+✅ Connect using a custom port
+ssh -p 2222 user@server-ip
+
+✅ Test SSH connection without login
+ssh -v user@server-ip
+
+
+(Used for troubleshooting)
+
+🟦 2. SSH Configuration File
+
+SSH config file:
+
+/etc/ssh/sshd_config     ← Server-side
+~/.ssh/config            ← Client-side
+
+🔧 Edit the SSH server config
+sudo vi /etc/ssh/sshd_config
+
+
+Important settings:
+
+Port 22
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+AllowUsers admin devops
+
+
+Then restart SSH:
+
+sudo systemctl restart sshd
+
+🟩 3. SSH Key-Based Authentication (Most Common in Companies)
+Step 1: Generate SSH key on client
+ssh-keygen -t rsa -b 4096
+
+Step 2: Copy public key to server
+ssh-copy-id user@server-ip
+
+
+OR manually:
+
+cat id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+
+Step 3: Disable password login (after testing)
+
+Edit:
+
+PasswordAuthentication no
+
+
+Restart service:
+
+sudo systemctl restart sshd
+
+🟦 4. Secure SSH (HARDENING STEPS)
+🔹 Change the default SSH port
+Port 2222
+
+🔹 Allow only selected users
+AllowUsers devops admin
+
+🔹 Disable root SSH login
+PermitRootLogin no
+
+🔹 Disable password authentication
+PasswordAuthentication no
+PubkeyAuthentication yes
+
+🔹 Enable SSH Rate Limiting (Fail2Ban)
+sudo apt install fail2ban -y
+
+🔹 Allow only specific IPs (firewall)
+sudo firewall-cmd --add-rich-rule='rule family="ipv4" source address="10.0.0.5" accept' --permanent
+sudo firewall-cmd --reload
+
+
+
+
+
+
+############################------------------->>>>>>>>>>>>>>>>>>  REAL COMPANY SECNARIOS <<<<<<<<<<<<<<<<<<<<<<----------------------------------#########################################
+
+Real Company SSH Scenarios (Very Important)
+Scenario 1: “We lost SSH access after changing port”
+Issue
+
+Admin changed SSH port to 2222 but firewall not updated.
+
+Solution
+sudo firewall-cmd --add-port=2222/tcp --permanent
+sudo firewall-cmd --reload
+sudo systemctl restart sshd
+
+Scenario 2: “Developers need access but only for specific servers”
+Solution
+
+Use AllowUsers with host matching:
+
+AllowUsers devops@10.10.1.*  tester@10.20.0.*
+
+Scenario 3: “Public key not working, still asks for password”
+Possible reasons:
+
+✔ Wrong permissions
+✔ Wrong key format
+✔ authorized_keys owner mismatch
+
+Fix:
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+chown user:user ~/.ssh -R
+
+Scenario 4: “SSH is very slow (5–10 seconds connection delay)”
+Solution:
+
+Disable reverse DNS lookup:
+
+UseDNS no
+
+
+Restart:
+
+systemctl restart sshd
+
+Scenario 5: “Brute-force attacks on SSH port 22”
+Solution:
+
+Change SSH port
+
+Install fail2ban
+
+Restrict users
+
+Port 2222
+PermitRootLogin no
+PasswordAuthentication no
+
+🟥 6. Real Errors & Fix Commands
+Error 1: “Permission denied (publickey)”
+Fix:
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
+Error 2: “Connection refused”
+Fix:
+sudo systemctl start sshd
+sudo systemctl enable sshd
+sudo firewall-cmd --add-port=22/tcp --permanent
+sudo firewall-cmd --reload
+
+Error 3: “No route to host”
+
+Meaning: network unreachable.
+
+Fix:
+
+Check IP
+
+Check VM network
+
+Check security groups (cloud)
+
+Example:
+
+ping server-ip
+ip a
+nmcli connection show
+
+🟦 7. Real-Time Commands Used in Companies
+Watch SSH logs live
+tail -f /var/log/secure     # RHEL
+tail -f /var/log/auth.log   # Ubuntu
+
+Check failed SSH login attempts
+grep "Failed password" /var/log/secure
+
+Check who logged into the server
+last
+
+Show active SSH sessions
+who
+w
+
+Block an IP attacking SSH
+sudo iptables -A INPUT -s 192.168.1.50 -j DROP
