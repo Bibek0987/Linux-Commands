@@ -1,1 +1,235 @@
 
+1. IMPORTANT LINUX PROCESS MONITORING COMMANDS (with explanation)
+1️⃣ ps – View running processes
+
+Shows running processes for the current user/session.
+
+Examples:
+ps
+
+
+→ Basic process list.
+
+ps aux
+
+
+→ Show all processes from all users.
+
+ps aux | grep nginx
+
+
+→ Check if nginx is running.
+
+2️⃣ top – Real-time process monitoring
+
+Displays live CPU, memory, load, tasks.
+
+top
+
+Useful inside top:
+
+k → kill a process
+
+h → help
+
+q → quit
+
+M → sort by memory
+
+P → sort by CPU
+
+3️⃣ htop – Advanced version of top
+
+(Only if installed)
+
+Install:
+
+sudo yum install htop -y   # RHEL/CentOS
+sudo apt install htop -y   # Ubuntu
+
+
+Run:
+
+htop
+
+
+Colorful + easy filtering.
+
+4️⃣ kill – Terminate a process
+kill <PID>
+
+
+Example:
+
+kill 1234
+
+
+Force kill:
+
+kill -9 1234
+
+5️⃣ pgrep – Find process ID by name
+pgrep sshd
+
+6️⃣ pkill – Kill by process name
+pkill httpd
+
+7️⃣ nice – Set priority while starting a process
+
+Lower value = higher priority.
+
+nice -n 10 myscript.sh
+
+8️⃣ renice – Change priority of an existing process
+renice 5 -p 1234
+
+9️⃣ systemctl – Manage system services
+
+Start:
+
+sudo systemctl start httpd
+
+
+Enable at boot:
+
+sudo systemctl enable httpd
+
+
+Check status:
+
+systemctl status httpd
+
+🔟 vmstat, iostat, sar – Advanced monitoring tools
+vmstat
+vmstat 2 5
+
+
+→ Shows memory, CPU, and process stats every 2 sec (5 times).
+
+iostat
+iostat -x 2
+
+
+→ Disk I/O monitoring.
+
+sar
+sar -u 2 5
+
+
+→ CPU usage history.
+
+🟣 2. REAL-TIME COMPANY SCENARIOS + COMMANDS + SOLUTIONS
+🧵 Scenario 1: Server is slow, CPU usage is 100%
+Check which process is consuming CPU:
+top -o %CPU
+
+Identify culprit:
+ps aux --sort=-%cpu | head
+
+Solution:
+
+Kill or restart the process:
+
+kill -9 <pid>
+
+
+Or restart service:
+
+systemctl restart tomcat
+
+🧵 Scenario 2: Memory leak issue
+Check memory usage:
+free -h
+
+List processes using high memory:
+ps aux --sort=-%mem | head
+
+Check which app is leaking:
+top -o %MEM
+
+
+👉 Fix: Restart the service, investigate logs.
+
+🧵 Scenario 3: Disk I/O high due to a heavy process
+Find I/O heavy processes:
+iotop
+
+
+or:
+
+ps aux --sort=-%io
+
+Solution:
+
+Throttle or stop the process.
+
+🧵 Scenario 4: Zombie processes found
+Find zombie processes:
+ps aux | grep Z
+
+Solution:
+
+Restart parent process:
+
+systemctl restart <service>
+
+🧵 Scenario 5: Web server down (httpd/nginx)
+Check if process is running:
+systemctl status httpd
+
+Start service:
+sudo systemctl start httpd
+
+Check port:
+ss -tulnp | grep :80
+
+🧵 Scenario 6: High load average but CPU is idle
+Check load:
+uptime
+
+Check disk I/O bottleneck:
+iostat -x 2
+
+
+Fix: Disk performance tuning, stop heavy cron job.
+
+🔴 3. COMMON ISSUES + SOLUTIONS (with commands)
+❗ Issue 1: Process stuck in uninterruptible sleep (D)
+
+Cause: Disk I/O, NFS hang, slow storage.
+
+Solution:
+
+Restart the service or unmount the stuck filesystem:
+
+umount -f /mnt/nfs
+
+❗ Issue 2: Process won't die even after kill -9
+
+Cause: Kernel wait state.
+
+Solution:
+Fix storage / disk/NFS issue.
+
+❗ Issue 3: Service failing on boot
+
+Check logs:
+
+journalctl -u docker
+
+
+Fix config error → restart.
+
+❗ Issue 4: Too many open files (ulimit issue)
+
+Error:
+
+Too many open files
+
+
+Fix:
+
+ulimit -n 65535
+
+
+Permanent fix: edit /etc/security/limits.conf.
