@@ -1,0 +1,44 @@
+REAL COMPANY SCENARIOS YOU MUST KNOW
+Scenario A: Deployment server CPU spike at midnight
+
+Cause: Backup cron job running.
+
+Fix:
+
+Check cron:
+
+crontab -l
+
+
+Move heavy job to off-peak time.
+
+Scenario B: Production server becoming slow randomly
+
+Check:
+
+vmstat 1 5
+iostat -x 2
+
+
+Root cause: I/O wait.
+
+Scenario C: Application not starting
+
+Check logs:
+
+journalctl -u appname
+
+
+Check memory:
+
+free -h
+
+Scenario D: DB process consuming high RAM
+
+Temporary fix:
+
+systemctl restart mariadb
+
+Scenario E: Too many orphan processes
+
+Fix: Restart parent service or reboot.
