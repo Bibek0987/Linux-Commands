@@ -1,0 +1,70 @@
+Interview Questions & Answers
+Q1. How do you secure SSH?
+
+Answer:
+
+Disable root login
+
+Disable password login
+
+Use SSH keys
+
+Change port
+
+Allow specific users
+
+Enable firewall rules
+
+Install fail2ban
+
+Use strong key size (4096 bits)
+
+Q2. What is the purpose of authorized_keys?
+
+Answer:
+It stores public keys that are allowed to SSH into the account.
+
+Q3. How to troubleshoot SSH login issues?
+
+Answer:
+
+Check logs: /var/log/secure
+
+Use verbose: ssh -vvv user@host
+
+Check permissions of ~/.ssh
+
+Verify firewall/ports
+
+Ensure key is correct
+
+Q4. Why disable root login?
+
+Answer:
+To prevent brute-force attacks and enforce least privilege.
+
+Q5. Why is password authentication insecure?
+
+Answer:
+Passwords can be guessed → Public key authentication is stronger.
+
+Q6. What is SSH key pair?
+
+Answer:
+
+Private key → kept on client
+
+Public key → stored in server’s authorized_keys
+
+Q7. What happens if authorized_keys permissions are wrong?
+
+Answer:
+SSH will ignore the key → user cannot login.
+
+Q8. What is “SSH Port Forwarding”?
+
+Answer:
+Tunnel traffic through SSH:
+
+ssh -L 8080:localhost:80 user@server
+
