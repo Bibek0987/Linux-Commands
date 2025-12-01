@@ -1,0 +1,179 @@
+ Part 1: Basic Commands to Control Services & Daemons (with simple explanation)
+
+Linux uses systemd to manage services.
+The command used is systemctl.
+
+✔ Start a service
+sudo systemctl start httpd
+
+
+Starts the service right now (Apache example).
+
+✔ Stop a service
+sudo systemctl stop httpd
+
+
+Stops the service immediately.
+
+✔ Restart a service
+sudo systemctl restart httpd
+
+
+Used when configuration changes are applied.
+
+✔ Reload service (without stopping)
+sudo systemctl reload httpd
+
+
+Reloads config without downtime (if service supports it).
+
+✔ Enable service on boot
+sudo systemctl enable httpd
+
+
+Service automatically starts after reboot.
+
+✔ Disable service
+sudo systemctl disable httpd
+
+
+Service won’t start after reboot.
+
+✔ Check service status
+systemctl status httpd
+
+
+Shows logs, active/inactive state, PID, etc.
+
+✔ View service logs (via journald)
+journalctl -u httpd
+
+
+View logs for a specific service.
+
+✔ View last 100 lines
+journalctl -u httpd -n 100
+
+✔ Follow real-time logs
+journalctl -u httpd -f
+
+##::-->>> Part 2: Real-Time Company Scenarios + Commands <<<-----::##
+🔹 Scenario 1: Website is not loading
+
+Check Apache/Nginx service:
+
+systemctl status httpd
+
+
+If inactive:
+
+systemctl start httpd
+systemctl enable httpd
+
+🔹 Scenario 2: Application service crashed unexpectedly
+
+Check logs:
+
+journalctl -u myapp.service -n 50
+
+
+Restart:
+
+systemctl restart myapp
+
+🔹 Scenario 3: Service fails on boot
+
+Check enabled services:
+
+systemctl is-enabled mysqld
+
+
+Fix by enabling:
+
+systemctl enable mysqld
+
+🔹 Scenario 4: Port is not listening
+
+Check if service is running:
+
+ss -tulnp | grep 80
+
+
+If no output → service not running → restart service.
+
+🔹 Scenario 5: Configuration change not applied
+
+Reload service:
+
+systemctl reload nginx
+
+
+If reload is not supported → use restart.
+
+🔹 Scenario 6: High CPU usage from a service
+
+Find the service:
+
+top
+
+
+Then restart:
+
+systemctl restart tomcat
+
+
+Check logs:
+
+journalctl -u tomcat
+
+##::-->>> Part 3: Common Issues & Solutions (with commands) <<<-----::##
+❗ Issue 1: Service fails to start
+
+Check the reason:
+
+systemctl status docker
+journalctl -u docker -n 50
+
+
+Fix missing directory or config, then restart:
+
+systemctl restart docker
+
+❗ Issue 2: “Unit not found”
+
+Means service file is missing.
+
+Check the directory:
+
+ls /usr/lib/systemd/system/
+ls /etc/systemd/system/
+
+
+Reload daemon:
+
+systemctl daemon-reload
+
+❗ Issue 3: Service stuck in failed state
+
+Reset it:
+
+systemctl reset-failed nginx
+systemctl start nginx
+
+❗ Issue 4: Service not enabled after reboot
+
+Fix:
+
+systemctl enable crond
+
+❗ Issue 5: Permission denied
+
+Check permissions:
+
+ls -l /usr/bin/myapp
+chmod +x /usr/bin/myapp
+
+
+Restart:
+
+systemctl restart myapp
