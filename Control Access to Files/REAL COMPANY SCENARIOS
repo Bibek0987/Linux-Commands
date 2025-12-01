@@ -1,0 +1,218 @@
+SCENARIO 1: Web Application Not Loading (Permission Denied)
+
+A company hosts a website on Apache/Nginx.
+Application returns:
+
+403 Forbidden
+Permission denied: /var/www/html
+
+Reason
+
+The web server user (apache, nginx, www-data) doesn’t have permission.
+
+Fix
+sudo chown -R apache:apache /var/www/html
+sudo chmod -R 755 /var/www/html
+
+Why it happens
+
+Developers deploy files, but ownership gets changed accidentally.
+
+🟩 🔵 SCENARIO 2: Jenkins Cannot Execute Build Script
+
+Jenkins job fails:
+
+permission denied: ./build.sh
+
+Reason
+
+Script missing execute permission.
+
+Fix
+chmod +x build.sh
+
+Real impact
+
+Build pipeline stops → deployment blocked → production release delayed.
+
+🟧 🔵 SCENARIO 3: Developer Needs Access Without Changing Owner
+
+A developer from the AI team needs access to a file managed by the Linux admin team.
+Ownership cannot be changed.
+
+Solution using ACL
+setfacl -m u:rahul:rw /data/report.csv
+
+Why real companies use this
+
+Multiple teams may need access → ACL gives fine-grained permission.
+
+🟨 🔵 SCENARIO 4: Shared Team Folder Keeps Overwriting Group Ownership
+
+Team folder /project/data/ is used by DevOps team.
+New files created inside become owned by “root” group instead of “devops”.
+
+Fix using SGID bit
+chgrp -R devops /project/data
+chmod 2775 /project/data
+
+Meaning of 2 (SGID)
+
+Files inside inherit the group.
+
+Real reason
+
+Prevents permission issues in shared environments.
+
+🟥 🔵 SCENARIO 5: A User Cannot Delete Files in Shared Folder
+
+Folder: /shared/logs/
+Users get:
+
+Operation not permitted
+
+Reason: sticky bit missing
+Fix
+chmod +t /shared/logs
+
+Where companies use sticky bit?
+
+/tmp
+
+Shared project folders
+
+Jenkins workspace
+
+🟪 🔵 SCENARIO 6: Application Logs Not Getting Created
+
+App fails to write logs in /var/log/app/:
+
+Error writing log file
+
+Reason
+
+Folder owned by root.
+
+Fix
+sudo chown -R appuser:appgroup /var/log/app
+chmod -R 750 /var/log/app
+
+In real companies
+
+Logging issues break monitoring (Prometheus/ELK).
+
+🟫 🔵 SCENARIO 7: Security Team Requires Sensitive File Protection
+
+Company must store credentials/keys with restricted access.
+
+Solution:
+chmod 600 secrets.key
+chown root:root secrets.key
+
+Why?
+
+Only root should read the file → standard security practice.
+
+🟦 🔵 SCENARIO 8: File Has ‘immutable’ Attribute — Cannot Delete or Edit
+
+Admin tries:
+
+rm -f config.conf
+
+
+Gets:
+
+Operation not permitted
+
+Reason
+
+File attribute immutable.
+
+Check
+lsattr config.conf
+
+Remove
+chattr -i config.conf
+rm config.conf
+
+Real company example
+
+Immutable protects important configs like /etc/resolv.conf.
+
+🟩 🔵 SCENARIO 9: Database Backup Fails Due to Permission Issues
+
+MySQL backup script writes to /backup/db/.
+
+Error:
+
+Permission denied: /backup/db
+
+Fix
+chown mysql:mysql /backup/db
+chmod 700 /backup/db
+
+Real impact
+
+Backups failing → high risk.
+
+🟧 🔵 SCENARIO 10: Docker Container Cannot Read Host Files
+
+Container mounts:
+
+/data:/app/data
+
+Inside container:
+
+permission denied
+
+Reason
+
+Host directory not owned properly.
+
+Fix
+sudo chown -R 1000:1000 /data
+chmod 755 /data
+
+Real-world usage
+
+Containers run as non-root → need correct UID/GID mapping.
+
+🔵 COMMON INTERVIEW QUESTIONS (REAL COMPANY INTERVIEWS)
+1️⃣ How do you give permission to only the owner?
+chmod 700 folder
+
+2️⃣ What is sticky bit?
+
+Only the owner can delete files in a shared folder.
+
+Set:
+
+chmod +t /shared
+
+3️⃣ What is the difference between 644, 755, and 775?
+
+644 → owner read+write, others read
+
+755 → owner rwx, others r-x (common for web apps)
+
+775 → owner & group rwx, others r-x
+
+4️⃣ What is ACL and why is it needed?
+
+ACL = fine-grained permission system.
+Used when multiple users need different access.
+
+5️⃣ How do you check all permissions (including ACL & attributes)?
+ls -l
+getfacl file
+lsattr file
+
+6️⃣ How do you give multiple users access to a directory?
+setfacl -m u:alice:rwx -m u:bob:rw /data
+
+7️⃣ How do you protect critical configuration files?
+chattr +i /etc/ssh/sshd_config
+
+8️⃣ What is the SGID bit?
+
+Ensures all files inherit group ownership.
