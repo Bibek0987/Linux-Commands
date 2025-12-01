@@ -1,0 +1,42 @@
+Common Interview Questions & Answers
+Q1. What is a daemon?
+
+A: A background process that runs without direct user interaction. Example: sshd, crond.
+
+Q2. What is systemd?
+
+A: The default init system on RHEL 7+, CentOS, Ubuntu 16+, managing services, logs, and boot.
+
+Q3. Difference between enable and start?
+
+start → starts service NOW
+
+enable → starts service on BOOT
+
+Q4. How do you check why a service failed?
+
+A:
+
+systemctl status servicename
+journalctl -u servicename
+
+Q5. What is systemctl daemon-reload used for?
+
+A: To reload service files after modifying /etc/systemd/system/*.service.
+
+Q6. How to check all running services?
+systemctl list-units --type=service --state=running
+
+Q7. How to mask a service?
+
+Prevents starting manually or automatically.
+
+systemctl mask firewalld
+
+
+Unmask:
+
+systemctl unmask firewalld
+
+Q8. How to see boot logs?
+journalctl -b
