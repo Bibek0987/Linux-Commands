@@ -1,0 +1,259 @@
+SSH Security Case Study (Real-Company Style)
+Case Study: Hardening SSH Access for AcmeTech Pvt. Ltd.
+📌 Company Background
+
+AcmeTech Pvt. Ltd. is a mid-size SaaS company hosting microservices on a hybrid environment of on-prem Linux servers + AWS EC2 instances.
+The DevOps team noticed suspicious login attempts and slow server access.
+
+🎯 Project Goal
+
+Secure, standardize, and automate SSH access across all servers.
+
+You are the Linux/DevOps Engineer responsible for:
+
+Hardening SSH configuration
+
+Implementing key-based authentication
+
+Restricting remote login
+
+Monitoring and troubleshooting SSH
+
+Creating company-wide SSH operational guidelines
+
+📍 PART 1 — PROBLEM STATEMENT
+Problem 1: Massive Failed SSH Login Attempts
+
+Security logs show thousands of brute-force attempts:
+
+grep "Failed password" /var/log/auth.log
+
+
+Solution needed → Limit login attempts + Block attackers
+
+Problem 2: Passwords Are Still Enabled
+
+Some developers still using passwords instead of SSH keys.
+This increases hacking risk.
+
+Problem 3: Root Login is Allowed
+
+Server allows:
+
+PermitRootLogin yes
+
+
+This is a major compliance violation.
+
+Problem 4: No SSH Activity Monitoring
+
+No team knows:
+
+who logged in
+
+from where
+
+what commands they ran
+This affects audits.
+
+📍 PART 2 — SOLUTION IMPLEMENTATION (Real Commands + Explanation)
+🔐 1. Enforce Key-Based Authentication
+Step 1 — Generate SSH Keys (user side)
+ssh-keygen -t rsa -b 4096 -C "dev1@acmetech"
+
+Step 2 — Copy key to server
+ssh-copy-id dev1@10.0.0.12
+
+Step 3 — Disable password-based login
+
+Edit SSH config:
+
+sudo vi /etc/ssh/sshd_config
+
+
+Set:
+
+PasswordAuthentication no
+PubkeyAuthentication yes
+
+
+Restart service:
+
+sudo systemctl restart sshd
+
+🚫 2. Disable Root Login
+
+Edit /etc/ssh/sshd_config:
+
+PermitRootLogin no
+
+
+Restart:
+
+systemctl restart sshd
+
+🔒 3. Limit Login Attempts (Brute Force Protection)
+sudo apt install fail2ban
+
+
+Enable SSH jail:
+
+sudo vi /etc/fail2ban/jail.local
+
+[sshd]
+enabled = true
+maxretry = 3
+bantime = 3600
+
+
+Restart:
+
+systemctl restart fail2ban
+
+🔐 4. Allow SSH Only From Specific IPs
+
+In /etc/ssh/sshd_config:
+
+AllowUsers dev1@10.0.0.*
+
+
+Or using firewall:
+
+sudo ufw allow from 10.0.0.0/24 to any port 22
+
+📄 5. SSH Logging & Monitoring Setup
+
+View recent logins:
+
+last -i
+
+
+Monitor login attempts live:
+
+tail -f /var/log/auth.log
+
+
+Track commands executed by users:
+
+ausearch -m USER_CMD
+
+
+Enable audit and logging in a Linux environment.
+
+📍 PART 3 — REAL COMPANY SCENARIO QUESTIONS & SOLUTIONS
+🧩 Scenario 1: "User cannot SSH after disabling passwords"
+Symptoms
+
+User reports:
+
+Permission denied (publickey)
+
+Troubleshooting
+
+Check file permissions:
+
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+
+
+Check if server accepts keys:
+
+grep PubkeyAuthentication /etc/ssh/sshd_config
+
+
+Check SSH logs:
+
+sudo tail -f /var/log/auth.log
+
+🧩 Scenario 2: "Multiple unauthorized attempts from China & Russia"
+Fix
+
+Block countries/IP ranges:
+
+sudo ufw deny from <IP>
+
+
+Enable fail2ban (bruteforce protection).
+
+🧩 Scenario 3: "Need to share access with 20 Developers"
+Best Practice
+
+Centralized authorized_keys management:
+
+/home/devops/.ssh/authorized_keys
+/home/team/.ssh/authorized_keys
+
+
+Use Ansible playbook to distribute keys.
+
+🧩 Scenario 4: “Server crashed due to too many open SSH connections”
+
+Check open connections:
+
+ss -tnp | grep ssh
+
+
+Limit connections:
+
+MaxSessions 5
+
+
+Restart.
+
+📍 PART 4 — INTERVIEW QUESTIONS & ANSWERS (SSH Focus)
+1. What is SSH?
+
+Secure Shell protocol used for encrypted remote login.
+
+2. How does key-based authentication work?
+
+User stores private key locally
+
+Server stores public key in ~/.ssh/authorized_keys
+
+Server validates keys → no password needed
+
+3. Difference between SSH1 and SSH2?
+
+SSH2 is more secure; SSH1 is deprecated.
+
+4. How do you harden SSH? (MOST asked)
+
+Answer:
+
+- Disable root login
+- Disable password login
+- Enable key-based auth
+- Change default port
+- Allow specific users/IPs
+- Configure fail2ban
+- Use firewall rules
+- Keep SSH updated
+
+5. How do you troubleshoot SSH?
+
+Commands:
+
+ssh -vvv user@host
+tail -f /var/log/auth.log
+systemctl status sshd
+ss -tnlp | grep 22
+
+6. How to copy files using SSH?
+scp file.txt user@host:/tmp/
+
+7. How to execute a remote command via SSH?
+ssh user@host "df -h"
+
+📍 PART 5 — Company-Style SSH Hardening Report (You Can Use in Resume)
+
+Tasks performed:
+
+✔ Converted password login → SSH key-based authentication
+✔ Removed root remote access
+✔ Configured fail2ban & UFW
+✔ Implemented audit logging
+✔ Restricted access to corporate IPs
+✔ Automated SSH key deployment using Ansible
+✔ Reduced brute-force attacks by 95%
+✔ Passed internal security compliance audit
