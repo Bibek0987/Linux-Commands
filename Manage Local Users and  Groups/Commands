@@ -1,1 +1,160 @@
 
+🟩 1. USER MANAGEMENT COMMANDS (with explanation)
+1️⃣ Create a new user
+sudo useradd username
+
+
+Creates a new user with default settings.
+
+2️⃣ Create user with home directory
+sudo useradd -m username
+
+
+-m ensures /home/username is created.
+
+3️⃣ Create user with specific shell
+sudo useradd -s /bin/bash devuser
+
+
+Assigns a shell.
+
+4️⃣ Set password for a user
+sudo passwd username
+
+
+Sets or resets user password.
+
+5️⃣ Add user to a group
+sudo usermod -aG groupname username
+
+
+-aG means append user to group.
+
+6️⃣ Delete user (keep home directory)
+sudo userdel username
+
+7️⃣ Delete user with home directory
+sudo userdel -r username
+
+
+-r removes home directory & mail.
+
+8️⃣ Modify username
+sudo usermod -l newname oldname
+
+9️⃣ Change user home directory
+sudo usermod -d /new/home username
+
+🔟 Check user details
+id username
+
+
+Shows UID, GID, groups.
+
+🟩 2. GROUP MANAGEMENT COMMANDS
+1️⃣ Create group
+sudo groupadd developers
+
+2️⃣ Delete group
+sudo groupdel developers
+
+3️⃣ Change group name
+sudo groupmod -n newgroup oldgroup
+
+4️⃣ Add user to multiple groups
+sudo usermod -aG dev,qa,test username
+
+5️⃣ Check which groups a user belongs to
+groups username
+
+🟦 3. REAL-TIME SCENARIOS WITH COMMANDS
+✅ Scenario 1: Give a developer access to deploy code
+
+Developer needs group access:
+
+sudo groupadd devops
+sudo useradd -m john
+sudo usermod -aG devops john
+
+
+Then give group permission:
+
+sudo chown -R root:devops /var/www/app
+sudo chmod -R 775 /var/www/app
+
+✅ Scenario 2: DevOps engineer must have sudo rights
+
+Add user to sudo/wheel group:
+
+Ubuntu/Debian:
+sudo usermod -aG sudo pavit
+
+RHEL/CentOS:
+sudo usermod -aG wheel pavit
+
+✅ Scenario 3: Lock/Unlock a user account
+
+Lock account:
+
+sudo passwd -l username
+
+
+Unlock account:
+
+sudo passwd -u username
+
+✅ Scenario 4: Password expiry for security
+
+Set password expiry to 90 days:
+
+sudo chage -M 90 username
+
+
+Check password ageing:
+
+sudo chage -l username
+
+✅ Scenario 5: Force password change on next login
+sudo passwd -e username
+
+🟥 4. ISSUES + SOLUTIONS (Real-time)
+❗ Issue 1: "useradd: command not found"
+
+Cause: Missing package
+Fix:
+
+sudo yum install shadow-utils -y    # RHEL
+sudo apt install passwd -y          # Ubuntu
+
+❗ Issue 2: "user already exists"
+
+Fix:
+
+id username
+
+
+If user exists, modify instead of create:
+
+sudo usermod ...
+
+❗ Issue 3: "cannot remove user — user logged in"
+
+Find session:
+# who
+
+
+Kill user session:
+# pkill -u username
+
+
+Then delete:
+# sudo userdel -r username
+
+❗ Issue 4: User cannot run sudo
+
+Check group:
+# groups username
+
+
+Add user to wheel/sudo:
+# sudo usermod -aG wheel username
