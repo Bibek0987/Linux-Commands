@@ -18,8 +18,7 @@ Stops the service immediately.
 ✔ Restart a service
 sudo systemctl restart httpd
 
-
-Used when configuration changes are applied.
+###  Used when configuration changes are applied. ####
 
 ✔ Reload service (without stopping)
 sudo systemctl reload httpd
