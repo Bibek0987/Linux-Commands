@@ -1,0 +1,66 @@
+INTERVIEW QUESTIONS + ANSWERS
+1️⃣ What is the meaning of 755 permission?
+
+Answer:
+
+Owner: read, write, execute (7)
+
+Group: read, execute (5)
+
+Others: read, execute (5)
+Common for web directories.
+
+2️⃣ Difference between chmod and chown?
+
+chmod changes permissions
+
+chown changes owner and group
+
+3️⃣ What are ACLs and why are they used?
+
+ACL = Access Control List
+Used when default owner/group permissions are not enough.
+Provides fine-grained access for multiple users.
+
+4️⃣ What is the sticky bit?
+
+Used on shared directories like /tmp.
+
+Only file owner can delete their file.
+
+Set sticky bit:
+chmod +t /sharedfolder
+
+5️⃣ What does SGID do on a directory?
+
+Files created inside the directory inherit group ownership.
+
+chmod 2775 project/
+
+6️⃣ How to check if a file has ACL applied?
+getfacl file.txt
+
+7️⃣ What does -rw-r--r-- mean?
+
+Owner: read/write
+
+Group: read
+
+Others: read
+
+8️⃣ What is the difference between symbolic and numeric chmod?
+
+Symbolic example:
+
+chmod u+x file
+
+
+Numeric example:
+
+chmod 755 file
+
+9️⃣ How to restrict a file so only the owner can access it?
+chmod 600 file.txt
+
+🔟 What command shows extended attributes (immutable)?
+lsattr file.txt
