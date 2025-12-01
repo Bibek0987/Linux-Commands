@@ -1,0 +1,40 @@
+Real Company Scenarios (Used in Production)
+🔥 Scenario A: DevOps pipeline deployment failed because service didn't start
+
+Fix:
+
+systemctl status myapp
+journalctl -u myapp -n 50
+systemctl restart myapp
+
+🔥 Scenario B: Database service down during peak hours
+
+Actions:
+
+systemctl status mariadb
+df -h  # check storage
+free -m  # check memory
+systemctl restart mariadb
+
+🔥 Scenario C: New version deployed → service not loading
+
+Check unit file:
+
+vim /etc/systemd/system/myapp.service
+systemctl daemon-reload
+systemctl restart myapp
+
+🔥 Scenario D: Ports blocked after enabling firewall
+
+Fix:
+
+firewall-cmd --add-port=8080/tcp --permanent
+firewall-cmd --reload
+systemctl restart myapp
+
+🔥 Scenario E: Cron jobs not running
+
+Check cron service:
+
+systemctl status crond
+systemctl enable --now crond
