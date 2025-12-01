@@ -1,0 +1,56 @@
+Interview Questions & Answers (Most Asked)
+Q1. How do you check real-time logs in Linux?
+
+A: Using:
+
+tail -f <log-file>
+journalctl -f
+
+Q2. What is log rotation?
+
+A: Log rotation automatically compresses, deletes, or rotates old logs to avoid disk full issues.
+
+Configuration: /etc/logrotate.conf
+
+Q3. How do you find errors in logs quickly?
+
+A:
+
+grep -i "error" /var/log/messages
+grep -iE "error|fail|critical" logfile
+
+Q4. What is journalctl?
+
+A: It reads systemd logs.
+
+Example:
+
+journalctl -u nginx
+
+Q5. How do you analyze logs of a service?
+
+A:
+
+journalctl -u <service-name> -n 50
+
+Q6. How do you troubleshoot high disk usage due to logs?
+
+A:
+
+Check large logs
+
+Clear old logs
+
+Setup logrotate
+
+Q7. How do you store logs centrally?
+
+A:
+
+ELK Stack (Elasticsearch, Logstash, Kibana)
+
+Splunk
+
+Grafana Loki
+
+Fluentd / Fluentbit
