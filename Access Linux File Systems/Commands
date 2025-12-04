@@ -93,3 +93,53 @@ Add entry:
 Reload:
 mount -a
 
+##########################################################---------------------------------#####################################################
+
+Important Commands to Locate Files in Red Hat Linux
+1️⃣ find – Search anywhere in filesystem
+find /path -option value -print
+
+Common usage:
+Command	Explanation
+find / -name httpd.conf	Find file by exact name
+find /etc -type f	Find only files
+find /var/log -type d	Find directories
+find /home -size +100M	Find files >100MB
+find /tmp -mtime -1	Modified within last 1 day
+find / -user apache	Files owned by user
+find / -perm 644	Files with permission 644
+2️⃣ locate – Very fast file search
+
+Uses a database /var/lib/mlocate/mlocate.db.
+
+Commands:
+locate filename
+
+
+Example:
+
+locate sshd_config
+
+
+Update the database manually:
+
+updatedb
+
+3️⃣ which – Find the executable path
+which ls
+
+
+Output:
+
+/usr/bin/ls
+
+4️⃣ whereis – Show binary, source & man page
+whereis bash
+
+
+Example output:
+
+bash: /usr/bin/bash /usr/share/man/man1/bash.1.gz
+
+5️⃣ type – Shows how a command is interpreted
+type cd
