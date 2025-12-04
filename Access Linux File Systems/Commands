@@ -1,0 +1,95 @@
+Basic Commands to Identify File Systems & Devices
+1️⃣ lsblk – List block devices
+lsblk
+lsblk -f
+
+Explanation
+
+Shows disks, partitions, LVM, mount points.
+
+-f displays filesystem type and UUID.
+
+Example Output
+sda
+ ├─sda1  xfs   /boot
+ ├─sda2  LVM2
+     ├─rhel-root xfs /
+     └─rhel-swap swap [SWAP]
+
+2️⃣ fdisk – Partition information (MBR disks)
+sudo fdisk -l
+
+Explanation:
+
+Lists disks, partitions, sizes, boot flags.
+
+3️⃣ blkid – Identify filesystem type & UUID
+sudo blkid
+
+Explanation:
+
+Shows filesystem type, UUID → used in /etc/fstab.
+
+4️⃣ df – Show mounted filesystems & usage
+df -h
+
+Explanation:
+
+Shows size, used, available space, mount points.
+
+5️⃣ mount – Show mounted filesystems
+mount | grep -v tmpfs
+
+6️⃣ ls -l /dev/ – Identify block devices
+ls -l /dev/sd*
+
+7️⃣ Checking LVM devices
+pvdisplay
+vgdisplay
+lvdisplay
+
+8️⃣ Using file to identify filesystem
+sudo file -s /dev/sda1
+
+BASIC CONCEPT (Simple Explanation)
+Mounting
+
+Mounting means attaching a filesystem (disk/partition/ISO/NFS etc.) to a directory so the OS can access its files.
+
+Example:
+You attach /dev/sdb1 to /data → now /data shows the files inside /dev/sdb1.
+
+Unmounting
+
+Unmounting means detaching the disk/filesystem from the directory.
+
+✅ 2. BASIC COMMANDS (Red Hat Style)
+✔ Check available disks
+lsblk
+
+✔ Create a directory to mount
+mkdir /mnt/mydisk
+
+✔ Mount a disk
+mount /dev/sdb1 /mnt/mydisk
+
+✔ Check mounted filesystems
+mount | grep sdb1
+df -h
+
+✔ Unmount a filesystem
+umount /mnt/mydisk
+OR
+umount /dev/sdb1
+
+✔ Mount a filesystem permanently (fstab)
+
+Edit:
+vim /etc/fstab
+
+Add entry:
+/dev/sdb1  /data  xfs  defaults  0  0
+
+Reload:
+mount -a
+
