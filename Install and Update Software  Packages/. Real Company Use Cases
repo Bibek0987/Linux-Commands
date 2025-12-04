@@ -1,0 +1,296 @@
+Real Company Use Cases (Highly Important)
+🏢 Use Case 1: Server Hardening – Remove Unnecessary Packages
+
+Security team requires removing unused packages.
+
+rpm -qa | grep ftp
+yum remove vsftpd -y
+
+🏢 Use Case 2: Set Up Internal YUM Repository for Offline Servers
+yum install httpd createrepo -y
+createrepo /var/www/html/repo
+
+🏢 Use Case 3: Patch Management Automation
+
+Using cron or Ansible:
+
+yum update -y
+
+
+Or using Ansible playbooks.
+
+🏢 Use Case 4: Application Dependency Installation
+
+Example: Developer needs python3, nginx, and a db client.
+
+yum install python3 nginx mysql -y
+
+🏢 Use Case 5: Compliance – Verify Packages
+
+Auditors want proof.
+
+rpm -Va
+
+
+###################################-_-_-_--__------------_____-__----____>>>>>>>>>>>>>>>>>>>>>>#########################################
+
+SCENARIO 1: Production Server Is Running Out of Space (SRE / Linux Admin)
+Problem:
+
+Monitoring alerts:
+
+Disk usage / is above 85%
+
+What You Would Do:
+Step 1: Check which partition is full
+df -h
+
+Step 2: Find which directory is causing the issue
+du -sh /* | sort -h
+
+Step 3: Clean logs
+rm -rf /var/log/*.gz
+rm -rf /var/log/*-2023*
+
+Step 4: Clean YUM cache
+yum clean all
+rm -rf /var/cache/yum
+
+Step 5: Clear journal logs
+journalctl --vacuum-size=100M
+
+Real Output:
+
+Disk space reduced from 91% → 54%.
+
+Interview Questions from This Scenario:
+
+Q1: What log files usually grow large in Linux?
+A: /var/log/messages, /var/log/secure, /var/log/audit/audit.log.
+
+Q2: How do you find large files quickly?
+
+find / -type f -size +500M
+
+
+Q3: How do you trim journal logs?
+A:
+
+journalctl --vacuum-size=100M
+
+🟩 🟠 SCENARIO 2: High CPU Usage on a Microservice (SRE / DevOps)
+Problem:
+
+A pod is running at 300% CPU and causing latency.
+
+Step 1: Identify the problematic process
+top
+
+Step 2: If in Kubernetes — check pod CPU
+kubectl top pods -n payments
+
+Step 3: Check logs
+kubectl logs payments-api-xyz -n payments
+
+Step 4: Apply resource limits
+
+Edit deployment:
+
+resources:
+  requests:
+    cpu: 200m
+  limits:
+    cpu: 500m
+
+
+Apply fix:
+
+kubectl apply -f deployment.yaml
+
+Outcome:
+
+CPU throttling stopped + app stable.
+
+Interview Questions:
+
+Q: What is CPU throttling?
+A: When a pod hits its CPU limit, Kubernetes reduces CPU access.
+
+Q: How do resource requests differ from limits?
+A:
+
+request = guaranteed minimum
+
+limit = hard maximum
+
+🟩 🟡 SCENARIO 3: Application Deployment Fails Due to Missing Dependencies (Linux Admin)
+Problem:
+
+Java app fails to start:
+
+Error: libz.so.1 not found
+
+Step 1: Find which package provides this file
+yum provides */libz.so.1
+
+Step 2: Install dependency
+yum install zlib -y
+
+Step 3: Restart the application
+systemctl restart app.service
+
+Interview Questions:
+
+Q: How do you find which package provides a specific file?
+
+yum provides /path/to/file
+
+
+Q: What is the difference between yum install & rpm -ivh?
+
+yum install resolves dependencies
+
+rpm -ivh does NOT
+
+🟩 🟣 SCENARIO 4: SSH Access Broken After Firewall Rules Change
+
+(Real scenario in many companies)
+
+Problem:
+
+No engineer is able to SSH into a production server.
+
+Step 1: Connect via Console/Vcenter/AWS Session Manager
+
+(No SSH available).
+
+Step 2: Check firewall
+firewall-cmd --list-all
+
+
+Port 22 missing.
+
+Step 3: Re-enable SSH
+firewall-cmd --add-service=ssh --permanent
+firewall-cmd --reload
+systemctl restart sshd
+
+Step 4: Verify
+ss -tulnp | grep 22
+
+Interview Questions:
+
+Q: How do you check if SSH port is open?
+
+ss -tulnp | grep ssh
+
+
+Q: How do you fix firewall misconfiguration?
+Use:
+
+firewall-cmd --add-service=ssh
+
+🟩 🟤 SCENARIO 5: Developers Unable to Pull Code from Git (DevOps)
+Problem:
+
+CI/CD pipeline is failing:
+
+Permission denied (publickey)
+
+Step 1: Check SSH key existence
+ls ~/.ssh/id_rsa*
+
+Step 2: Generate new key (if missing)
+ssh-keygen -t rsa -b 4096
+
+Step 3: Add public key to GitHub
+cat ~/.ssh/id_rsa.pub
+
+
+Copy → Add to GitHub → SSH keys.
+
+Step 4: Test
+ssh -T git@github.com
+
+Interview Questions:
+
+Q: How do SSH keys work?
+A: Public key stored on Git server → private key on client.
+
+Q: How do you test SSH connectivity?
+
+ssh -vT git@github.com
+
+🟩 🔴 SCENARIO 6: YUM Repos Are Not Working (Linux Admin / SRE)
+Problem:
+Cannot find valid baseurl for repo
+
+Cause:
+
+No DNS
+
+No internet
+
+Repo disabled
+
+Fix Step 1: Check network
+nmcli connection show
+ping 8.8.8.8
+ping google.com
+
+Fix Step 2: Fix repo file
+vi /etc/yum.repos.d/redhat.repo
+
+
+Ensure:
+
+enabled=1
+
+Fix Step 3: Clean cache
+yum clean all
+
+Interview Questions:
+
+Q: How do you check enabled repos?
+
+yum repolist
+
+
+Q: How to fix yum metadata issues?
+
+yum clean all
+rm -rf /var/cache/yum
+
+🟩 🟦 SCENARIO 7: CI/CD Deployment Failed Due to Wrong YAML (DevOps)
+
+Pipeline error:
+
+Error: unable to parse deployment.yaml: mapping values are not allowed
+
+Step 1: Validate YAML
+yamllint deployment.yaml
+
+Step 2: Fix indentation
+
+Example error:
+
+containers:
+- name: app
+image: nginx
+
+
+Correct version:
+
+containers:
+  - name: app
+    image: nginx
+
+Step 3: Re-run pipeline
+Interview Questions:
+
+Q: How do you validate YAML?
+A:
+yamllint file.yaml
+
+Q: What is the most common YAML error?
+A: Indentation.
