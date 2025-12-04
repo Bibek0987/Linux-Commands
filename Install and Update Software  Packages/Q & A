@@ -1,1 +1,32 @@
+Interview Questions & Answers (Most Asked)
+Q1: What is the difference between YUM and RPM?
 
+Answer:
+
+RPM → installs a package but does NOT resolve dependencies.
+
+YUM/DNF → installs packages with dependencies automatically.
+
+Q2: How do you check which package a file belongs to?
+rpm -qf /usr/bin/top
+
+Q3: How do you list package dependencies?
+rpm -qpR <package>.rpm
+
+Q4: How do you rollback a package installation?
+yum history undo <id>
+
+Q5: What is a repository?
+
+A storage location containing packages, metadata, and GPG keys.
+
+Q6: How do you clean YUM cache?
+yum clean all
+rm -rf /var/cache/yum
+
+Q7: What is the purpose of GPG keys?
+
+To verify the authenticity and integrity of RPM packages.
+
+Q8: How to install a package without internet?
+rpm -ivh package.rpm
