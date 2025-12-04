@@ -191,3 +191,170 @@ backupserver:/archive /mnt/backup  nfs  defaults 0 0
 
 ##########################################---------------------------------------------------############################################
 
+Real-Time Enterprise Scenarios (VERY IMPORTANT)
+Scenario 1: Application not starting because config file is missing
+
+Developer says:
+
+“My app cannot find config.yml”
+
+You run:
+
+find / -name config.yml 2>/dev/null
+
+
+You discover it is under /opt/app/conf/config.yml.
+You update the service file:
+
+Environment="CONFIG_PATH=/opt/app/conf/config.yml"
+systemctl daemon-reload
+systemctl restart myapp
+
+Scenario 2: Server disk full; find largest files
+find / -type f -size +500M -exec ls -lh {} \; 2>/dev/null
+
+
+or easier:
+
+du -sh /* | sort -h
+
+
+You find /var/log/messages is 8GB → rotate logs:
+
+logrotate -f /etc/logrotate.conf
+
+Scenario 3: Find world-writable files (Security Audit)
+
+Security team asks:
+
+find / -perm -002 -type f 2>/dev/null
+
+
+Fix:
+
+chmod o-w <file>
+
+Scenario 4: Identify files changed in the last 10 minutes
+
+Useful for debugging unauthorized change.
+
+find / -mmin -10 2>/dev/null
+
+Scenario 5: Find all files created by a terminated employee
+find /home -user john
+
+
+Then archive or transfer:
+
+tar -czf john_backup.tar.gz /home/john
+
+🔴 3. Common Issues + Solutions
+❌ Issue 1: locate gives no result
+locate nginx.conf
+
+
+No output.
+
+✔ Fix: update the database
+
+sudo updatedb
+
+❌ Issue 2: find shows many permission denied errors
+find / -name test
+
+
+✔ Fix:
+
+find / -name test 2>/dev/null
+
+
+or run as root.
+
+❌ Issue 3: find command is slow
+
+✔ Use specific paths:
+
+❌ BAD:
+
+find / -name server.crt
+
+
+✔ GOOD:
+
+find /etc -name server.crt
+
+❌ Issue 4: Find symbolic link target
+readlink -f /usr/bin/python
+
+❌ Issue 5: Cannot find where a package installed files**
+
+Example:
+
+rpm -ql httpd
+
+🔴 4. Interview Questions & Answers (Very Common)
+Q1: Difference between find and locate?
+
+Answer:
+
+find searches the filesystem in real time → slower, always accurate
+
+locate uses a prebuilt database → very fast but may be outdated
+
+Q2: How to find files modified in last 24 hours?
+find / -mtime -1
+
+Q3: How to find & delete .log files bigger than 100MB?
+find /var/log -name "*.log" -size +100M -delete
+
+Q4: How to find all files owned by a specific user?
+find / -user username
+
+Q5: What is the difference between whereis and which?
+
+which → executable path in $PATH
+
+whereis → binary + source + man-page locations
+
+Q6: A developer says “my script is using wrong python version.” What do you check?
+which python
+type python
+
+🔴 5. Real Company Use Cases (asked in RHCSA job roles)
+Use Case 1: Security Audit
+
+Security team asks:
+
+“Find all SUID and SGID files.”
+
+Command:
+
+find / -perm /6000 -type f 2>/dev/null
+
+Use Case 2: Identify When a Server Was Compromised
+
+Search for newly created files:
+
+find / -mmin -60 -type f
+
+Use Case 3: Developer Lost the Location of a Script
+find / -name deploy.sh
+
+Use Case 4: Find Log Files Growing Rapidly
+find /var/log -type f -size +500M
+
+
+Investigate:
+
+tail -f /var/log/messages
+
+Use Case 5: Find all open ports & config files
+ss -tulnp
+find /etc -name "*.conf"
+
+🔴 6. BONUS: Useful Shortcuts for RHCSA
+Task	Command
+Find 10 largest files	               `find / -type f -exec du -sh {} +
+Find hidden files	                        find /home -name ".*"
+Find empty directories	                    find / -type d -empty
+Find files changed by user	                   find / -user admin -mtime -1
