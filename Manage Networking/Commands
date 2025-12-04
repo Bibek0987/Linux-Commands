@@ -1,0 +1,215 @@
+Basic Networking Commands (With Explanation)
+1️⃣ ip addr
+
+Shows IP addresses of all interfaces.
+
+ip addr
+
+
+Useful for checking IP, subnet mask, interfaces.
+
+2️⃣ ip link
+
+Shows network interfaces and their state.
+
+ip link show
+
+
+Enable/disable an interface:
+
+sudo ip link set eth0 up
+sudo ip link set eth0 down
+
+3️⃣ ip route
+
+Shows routing table.
+
+ip route
+
+
+Add a route:
+
+sudo ip route add 192.168.20.0/24 via 192.168.1.1
+
+4️⃣ ping
+
+Checks connectivity to another host.
+
+ping google.com
+
+5️⃣ curl
+
+Checks if a service/website is reachable (HTTP/S).
+
+curl -I https://google.com
+
+6️⃣ ss (socket statistics)
+
+Replaces netstat, shows open ports.
+
+ss -tulnp
+
+7️⃣ nmcli
+
+NetworkManager CLI tool (RHEL/CentOS/Rocky/Amazon Linux).
+
+View connections:
+
+nmcli connection show
+
+
+Add new connection:
+
+nmcli connection add con-name static-ip ifname eth0 type ethernet ipv4.addresses 192.168.1.10/24 ipv4.gateway 192.168.1.1 ipv4.dns 8.8.8.8 ipv4.method manual
+
+8️⃣ hostnamectl
+
+Check and set system hostname.
+
+hostnamectl status
+hostnamectl set-hostname webserver01
+
+9️⃣ systemctl status network
+
+Used on older systems where network service runs.
+
+🔟 tcpdump
+
+Capture packets on an interface.
+
+sudo tcpdump -i eth0
+
+
+Capture only port 443:
+
+sudo tcpdump -i eth0 port 443
+
+🟧 2. Real-Time Scenarios + Commands
+🟩 Scenario 1: Server is not reachable (Ping fails)
+Steps to troubleshoot:
+1. Check IP
+ip addr
+
+2. Check interface status
+ip link show
+
+3. Restart network
+sudo systemctl restart NetworkManager
+
+4. Check firewall
+sudo firewall-cmd --state
+sudo firewall-cmd --list-all
+
+5. Check routing
+ip route
+
+🟩 Scenario 2: DNS not resolving
+
+Symptoms:
+Can ping IP but not domain name.
+
+Fix:
+
+Check /etc/resolv.conf
+
+cat /etc/resolv.conf
+
+
+Add DNS server:
+
+echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf
+
+
+Test:
+
+ping google.com
+
+🟩 Scenario 3: Two servers cannot communicate
+
+Check firewall:
+
+sudo firewall-cmd --list-ports
+
+
+Open a port:
+
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --reload
+
+
+Check SELinux block:
+
+sudo setenforce 0
+
+
+If works → add permanent rule in /etc/selinux/config
+
+🟩 Scenario 4: Web page not loading but server is up
+
+Check if port is open:
+
+ss -tulnp | grep 80
+
+
+Check firewall:
+
+sudo firewall-cmd --add-service=http --permanent
+sudo firewall-cmd --reload
+
+
+Check SELinux:
+
+sudo getenforce
+
+🟩 Scenario 5: Add a static IP to a RHEL server
+nmcli connection modify eth0 \
+ipv4.addresses 192.168.1.50/24 \
+ipv4.gateway 192.168.1.1 \
+ipv4.dns 8.8.8.8 \
+ipv4.method manual
+
+nmcli connection up eth0
+
+🟥 3. Issues + Solutions
+❌ Issue: No Internet but local ping works
+Solution:
+
+Check DNS.
+
+cat /etc/resolv.conf
+
+
+Add:
+
+nameserver 8.8.8.8
+
+❌ Issue: Interface down after reboot
+Solution:
+nmcli con mod eth0 connection.autoconnect yes
+
+❌ Issue: Duplicate IP conflict
+Solution:
+
+Check ARP:
+arp -a
+
+Change IP:
+nmcli con mod eth0 ipv4.addresses 192.168.1.80/24
+nmcli con up eth0
+
+❌ Issue: Service listening on wrong interface
+Solution:
+
+Check service:
+
+ss -tulnp
+
+
+Fix config:
+
+listen 0.0.0.0:8080
+
+
+Restart:
+
+systemctl restart <service>
