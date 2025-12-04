@@ -1,0 +1,193 @@
+1: A new disk is attached — You must partition, format, and mount it
+Commands:
+lsblk
+fdisk /dev/sdc   # create /dev/sdc1
+mkfs.xfs /dev/sdc1
+mkdir /appdata
+mount /dev/sdc1 /appdata
+echo "/dev/sdc1 /appdata xfs defaults 0 0" >> /etc/fstab
+
+Why this is real?
+
+This happens during adding storage for applications, logs, backup, database, or Docker/OCP storage.
+
+🟦 SCENARIO 2: Developer complains “disk is full”
+Check disks:
+df -h
+du -sh /var/log/*
+
+Found /data disk is not mounted (mount failed after reboot)
+Fix:
+mount -a
+
+
+If error → check fstab syntax.
+
+🟨 SCENARIO 3: NFS Share needs to be mounted for application
+Test NFS:
+showmount -e 10.0.0.20
+
+Mount:
+mount -t nfs 10.0.0.20:/sapdata /mnt/sap
+
+Permanent:
+10.0.0.20:/sapdata  /mnt/sap  nfs  defaults  0 0
+
+🟥 SCENARIO 4: "device is busy" when trying to unmount
+Issue:
+umount /data
+umount: /data: target is busy.
+
+Solution: find who is using it
+lsof | grep /data
+fuser -m /data
+
+
+Kill processes:
+
+fuser -km /data
+umount /data
+
+🟧 SCENARIO 5: ISO file needs to be mounted
+mount -o loop RHEL9.iso /mnt/iso
+
+
+Unmount:
+
+umount /mnt/iso
+
+----------------------------
+🔧 4. COMMON ISSUES & SOLUTIONS
+----------------------------
+❌ Error: "mount: wrong fs type"
+
+Fix:
+
+blkid /dev/sdb1
+mkfs.xfs /dev/sdb1
+
+❌ Error: "mount: special device does not exist"
+
+Fix:
+
+lsblk
+fdisk -l
+udevadm settle
+
+❌ Error: machine stuck during boot because fstab entry is wrong
+
+Fix by editing fstab in rescue mode:
+
+mount -o remount,rw /
+vim /etc/fstab
+
+
+Add noauto temporarily or comment the broken line.
+
+❌ Error: "target is busy"
+
+Fix:
+
+lsof /data
+fuser -km /data
+umount /data
+
+----------------------------
+🧠 5. INTERVIEW QUESTIONS (with Answers)
+----------------------------
+1. What is mounting in Linux?
+
+Mounting means attaching a filesystem to a directory so the OS can access it.
+
+2. What file is used for permanent mounting?
+/etc/fstab
+
+3. How to check which process is preventing unmount?
+fuser -m /mountpoint
+lsof /mountpoint
+
+4. Difference between mount and unmount?
+
+mount → add filesystem
+
+umount → remove filesystem
+
+5. How to mount ISO?
+mount -o loop file.iso /mnt
+
+6. What happens if fstab has a wrong entry?
+
+The system may not boot.
+
+7. How to mount NFS?
+mount -t nfs server:/path /mnt
+
+8. How to remount root filesystem read-write?
+mount -o remount,rw /
+
+----------------------------
+🏢 6. REAL COMPANY SCENARIOS (Very Common)
+----------------------------
+⭐ Scenario A — Application server needs a separate /app mount
+
+Company wants separate storage for application logs.
+
+Solution:
+fdisk /dev/sdb
+mkfs.xfs /dev/sdb1
+mkdir /app
+mount /dev/sdb1 /app
+echo "/dev/sdb1 /app xfs defaults 0 0" >> /etc/fstab
+
+⭐ Scenario B — Database (MySQL/PostgreSQL) needs separate storage
+
+DB team asks for separate mount for /var/lib/mysql.
+
+Steps:
+
+Stop DB
+
+Mount new disk
+
+Copy old data
+
+Update fstab
+
+⭐ Scenario C — Kubernetes/OpenShift storage
+
+Storage team provides new disk for container logs.
+
+Mount under:
+
+/var/lib/containers
+/var/lib/kubelet
+
+
+Requires:
+
+mount /dev/sdc1 /var/lib/containers
+
+⭐ Scenario D — Programmer accidentally deleted fstab entry
+
+System fails to mount important disk → website down.
+
+Fix:
+
+mount -a
+vim /etc/fstab
+
+⭐ Scenario E — Backup team wants NFS mount
+
+Mount backup storage:
+
+mount -t nfs backupserver:/archive /mnt/backup
+
+
+Add in fstab:
+
+backupserver:/archive /mnt/backup  nfs  defaults 0 0
+
+
+
+##########################################---------------------------------------------------############################################
+
