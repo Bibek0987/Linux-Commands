@@ -1,5 +1,5 @@
 ARCHIVE & COMPRESS COMMANDS
-1️⃣ tar – Archive & Compress Files
+1️. tar – Archive & Compress Files
 
 Tar is the most used tool in Linux for backup and packaging.
 
@@ -26,18 +26,20 @@ j = bzip2
 
 C = extract to directory
 
-2️⃣ gzip / gunzip — Compress Single Files
+2️. gzip / gunzip — Compress Single Files
 Command	                                              Explanation
 gzip file.txt	                                        Compresses → file.txt.gz
 gunzip file.txt.gz	                                  Decompress
 gzip -9 file.txt	                                    Maximum compression
-3️⃣ zip / unzip — Windows-Compatible Archives
+
+3️. zip / unzip — Windows-Compatible Archives
 Command	                                              Explanation
 zip backup.zip file1 file2	                          Create zip
 zip -r project.zip /project	                          Zip a folder
 unzip project.zip -d /tmp	                            Extract zip file
-✅ 2. FILE TRANSFER COMMANDS
-1️⃣ scp — Secure Copy Between Systems
+
+ 2. FILE TRANSFER COMMANDS
+1️. scp — Secure Copy Between Systems
 Basic usage:
 scp file.txt user@server:/tmp
 
@@ -51,7 +53,7 @@ Copy from remote → local:
 
 scp user@server:/var/log/messages .
 
-2️⃣ rsync — Best tool for backup & syncing
+2️. rsync — Best tool for backup & syncing
 
 Very commonly used in real companies.
 
@@ -70,7 +72,7 @@ z = compress
 
 --delete = remove files not present in source
 
-3️⃣ sftp — Secure File Transfer Terminal
+3️. sftp — Secure File Transfer Terminal
 sftp user@server
 put file.txt
 get logs.tar.gz
