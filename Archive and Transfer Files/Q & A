@@ -1,0 +1,38 @@
+. INTERVIEW QUESTIONS & ANSWERS (Most Asked)
+Q1: What is the difference between tar and zip?
+
+Answer:
+
+tar only archives; gzip adds compression
+
+zip archives and compresses simultaneously
+
+zip can compress individual files; tar compresses whole archive
+
+Q2: What is rsync and why is it better than scp?
+
+Answer:
+rsync transfers only changed blocks, supports resume, and can sync directories.
+
+Q3: What is the use of --delete option in rsync?
+
+Answer:
+It deletes files on the destination that are not in source.
+Used in mirroring.
+
+Q4: How to check a tar file without extracting?
+tar -tvf file.tar.gz
+
+Q5: How do you copy files between two remote servers?
+scp user1@serverA:/data/file user2@serverB:/backup
+
+
+Or:
+
+rsync -avz user1@A:/data user2@B:/backup
+
+Q6: How do you compress multiple folders?
+tar -czvf project.tar.gz folder1 folder2 folder3
+
+Q7: How to resume a broken file transfer?
+rsync -avzP file.iso user@server:/backup
