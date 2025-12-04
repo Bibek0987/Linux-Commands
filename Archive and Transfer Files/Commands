@@ -1,0 +1,172 @@
+ARCHIVE & COMPRESS COMMANDS
+1️⃣ tar – Archive & Compress Files
+
+Tar is the most used tool in Linux for backup and packaging.
+
+Basic Commands
+Command	                                              Explanation
+tar -cvf backup.tar /data	                            Create archive without compression
+tar -czvf backup.tar.gz /data                       	Create archive with gzip compression
+tar -cjvf backup.tar.bz2 /data	                      Create archive with bzip2 compression
+tar -xvf backup.tar	                                  Extract tar file
+tar -xzvf backup.tar.gz -C /tmp	                      Extract to specific location
+Options:
+
+c = create
+
+x = extract
+
+v = verbose
+
+f = file
+
+z = gzip
+
+j = bzip2
+
+C = extract to directory
+
+2️⃣ gzip / gunzip — Compress Single Files
+Command	                                              Explanation
+gzip file.txt	                                        Compresses → file.txt.gz
+gunzip file.txt.gz	                                  Decompress
+gzip -9 file.txt	                                    Maximum compression
+3️⃣ zip / unzip — Windows-Compatible Archives
+Command	                                              Explanation
+zip backup.zip file1 file2	                          Create zip
+zip -r project.zip /project	                          Zip a folder
+unzip project.zip -d /tmp	                            Extract zip file
+✅ 2. FILE TRANSFER COMMANDS
+1️⃣ scp — Secure Copy Between Systems
+Basic usage:
+scp file.txt user@server:/tmp
+
+
+Copy folder:
+
+scp -r /data user@server:/backup/
+
+
+Copy from remote → local:
+
+scp user@server:/var/log/messages .
+
+2️⃣ rsync — Best tool for backup & syncing
+
+Very commonly used in real companies.
+
+Command	                                                        Explanation
+rsync -av /data /backup	                                        Sync directories
+rsync -avz /data user@server:/backup	                          Sync with compression
+rsync -av --delete /data /mirror	                              Keep mirror directory
+
+Options:
+
+a = archive mode
+
+v = verbose
+
+z = compress
+
+--delete = remove files not present in source
+
+3️⃣ sftp — Secure File Transfer Terminal
+sftp user@server
+put file.txt
+get logs.tar.gz
+
+🔥 3. REAL-TIME COMPANY SCENARIOS (Red Hat & DevOps)
+Scenario 1: Take backup of /etc before configuration change
+
+Command:
+
+tar -czvf etc-backup-$(date +%F).tar.gz /etc
+
+
+Why:
+Before patching or upgrading services, sysadmins take backup of important configs.
+
+Scenario 2: Transfer logs to another server for troubleshooting
+scp /var/log/messages admin@10.10.1.55:/logs/server1/
+
+Scenario 3: Sync production files to DR site using rsync
+rsync -avz /var/www/html dradmin@192.168.1.20:/dr-web
+
+
+Why:
+Used daily in enterprise disaster recovery setups.
+
+Scenario 4: Archive old logs monthly
+tar -czvf logs-$(date +%b-%Y).tar.gz /var/log/httpd
+
+
+Move it:
+
+mv logs-*.gz /archive/
+
+Scenario 5: Copy large files over slow network
+rsync -avzP bigfile.iso user@server:/mnt/share
+
+
+-P shows progress + resumes broken transfers.
+
+⚠️ 4. COMMON ISSUES + SOLUTIONS
+❌ Issue 1: Permission denied while using scp
+
+Error:
+
+scp file.txt user@server:/etc/
+Permission denied
+
+
+Solution:
+Remote user doesn’t have permission.
+
+scp file.txt user@server:/tmp
+sudo mv /tmp/file.txt /etc/
+
+
+Or fix permissions.
+
+❌ Issue 2: tar extraction fails due to incorrect directory
+tar -xzvf backup.tar.gz
+tar: This does not look like a tar archive
+
+
+Solution:
+Check file type:
+
+file backup.tar.gz
+
+❌ Issue 3: rsync deletes important files because of --delete
+
+Real mistake in companies
+
+Wrong:
+
+rsync -av --delete /source /target
+
+
+If /source is empty → /target gets deleted.
+
+Solution:
+
+✔ Use --dry-run first:
+
+rsync -av --delete --dry-run /source /target
+
+❌ Issue 4: sftp connection timeout
+Connection timed out
+
+
+Solution:
+
+Check firewall:
+
+sudo firewall-cmd --add-service=ssh --permanent
+sudo firewall-cmd --reload
+
+
+Check SSH:
+
+systemctl restart sshd
