@@ -1,0 +1,45 @@
+Real Company Scenarios (Asked in Interviews)
+
+Scenario: “Production Web Application Down”
+You check:
+Firewall
+Nginx/Apache
+DNS
+Routing
+Load balancer health checks
+SSL certificate
+Disk full issue
+Network latency or packet drop
+
+Scenario: “Two Microservices cannot talk to each other”
+
+Check:
+Pod IP / service IP
+Firewall/iptables
+Port open or not
+DNS inside Kubernetes:
+## kubectl exec <pod> -- nslookup service-name
+
+
+Service type: ClusterIP / NodePort
+
+SELinux
+
+Scenario: “SSH not working in Production”
+
+Check:
+
+systemctl status sshd
+ss -tulnp | grep 22
+firewall-cmd --list-all
+fail2ban status
+
+
+Fix based on issue.
+
+Scenario: “Server unreachable after IP change”
+
+Fix:
+
+nmcli con mod eth0 connection.autoconnect yes
+nmcli con up eth0
