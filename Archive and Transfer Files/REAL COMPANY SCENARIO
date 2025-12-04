@@ -1,0 +1,206 @@
+########----->>>>>> REAL COMPANY SCENARIO 1: Monthly Server Backup Before Patch Window
+
+Situation:
+Every month before patching (kernel upgrade / package updates), sysadmins take a backup of critical folders:
+
+/etc (configuration)
+
+/var/www (application code)
+
+/opt/apps (custom software)
+
+Command:
+
+tar -czvf prepatch-backup-$(hostname)-$(date +%F).tar.gz /etc /var/www /opt/apps
+mv prepatch-backup*.gz /backups/prepatch/
+
+
+Why:
+If patching breaks a service, team immediately restores backup.
+
+########----->>>>>> REAL COMPANY SCENARIO 2: Copy 100+ GB Logs to Central Logging Server
+
+Situation:
+App support team needs to move logs from production servers to a central log-analyzer due to disk full alerts.
+
+Command:
+
+rsync -avzP /var/log/app/ logserver@10.10.10.20:/data/logs/$(hostname)/
+
+
+Why rsync?
+
+Shows progress (-P)
+
+Transfers only changed data
+
+Resumes broken transfers (very useful)
+
+########----->>>>>> REAL COMPANY SCENARIO 3: Web Application Deployment to Multiple Servers
+
+Situation:
+A QA engineer builds a new WAR file and needs to copy it to 5 app servers.
+
+Command:
+
+for i in app01 app02 app03 app04 app05; do 
+    scp app.war devops@$i:/opt/tomcat/webapps/
+done
+
+
+Why:
+Ensures all servers receive the same build version.
+
+########----->>>>>> REAL COMPANY SCENARIO 4: Sync Web App to DR Site
+
+Situation:
+Production team keeps a continuous replica of web content to DR site.
+
+Command (runs every 5 minutes via cron):
+
+rsync -avz --delete /var/www/html dradmin@192.168.100.20:/dr/html/
+
+
+Why:
+If Prod crashes -> DR takes over immediately.
+
+#######----->>>>>> REAL COMPANY SCENARIO 5: Compress Large Data Before Sending to Cloud
+
+Situation:
+Team needs to upload a 10GB folder to S3 (AWS).
+To save upload time → compress first.
+
+Command:
+
+tar -czf project.tar.gz /opt/project
+aws s3 cp project.tar.gz s3://company-backups/
+
+
+Benefit:
+10GB folder becomes 1–2GB → faster upload.
+
+########----->>>>>> REAL COMPANY SCENARIO 6: Archive Old Logs to Free Space
+
+Situation:
+Application nodes generate large logs and disk is 80% used.
+
+Solution:
+Compress logs older than 7 days:
+
+find /var/log/app -type f -mtime +7 -exec gzip {} \;
+
+
+Move them to archive:
+
+mv /var/log/app/*.gz /opt/log-archive/
+
+########----->>>>>> REAL COMPANY SCENARIO 7: Transfer Database Backup to Another Region
+
+DB team creates a backup every night and transfers it to another data center.
+
+scp large-db-backup-$(date +%F).sql.gz dbadmin@172.16.50.10:/backup/central/
+
+
+Or with better speed + resume:
+
+rsync -avzP large-db*.gz dbadmin@172.16.50.10:/backup/central/
+
+########----->>>>>> REAL COMPANY SCENARIO 8: Create & Ship Support Bundle for Vendor (Red Hat / VMware)
+
+When creating a support ticket, engineers must collect system logs and compress them.
+
+Command:
+
+sosreport --batch
+
+
+But when manually collecting files:
+
+tar -czvf supportbundle-$(hostname)-$(date +%F).tar.gz /var/log /etc /var/lib/messages
+scp supportbundle*.gz vendor@support.company.com:/uploads/
+
+########----->>>>>> REAL COMPANY SCENARIO 9: Developer Requests Old Version of a File
+
+Team needs to retrieve a config file from last week for comparison.
+
+Command:
+
+tar -tvf etc-backup-2024-10-09.tar.gz | grep httpd.conf
+tar -xvf etc-backup-2024-10-09.tar.gz etc/httpd/conf/httpd.conf -C /tmp/restore/
+
+########----->>>>>> REAL COMPANY SCENARIO 10: Automatically Rotate & Compress Logs
+
+Logrotate configuration example:
+
+/var/log/myapp/*.log {
+    daily
+    rotate 14
+    compress
+    missingok
+    notifempty
+}
+
+
+This compresses old logs daily and removes files older than 14 days.
+
+🔧 COMMON REAL ISSUES + SOLUTIONS
+❌ Issue 1: “Permission denied” while transferring files
+scp: /var/www/html/: Permission denied
+
+
+Solution:
+
+Upload to /tmp then move:
+
+scp app.war user@server:/tmp
+sudo mv /tmp/app.war /var/www/html/
+
+❌ Issue 2: Broken scp transfer during large file copy
+
+Fix: Use rsync with resume
+
+rsync -avzP largefile.iso user@server:/backup/
+
+❌ Issue 3: Wrong tar extraction directory
+
+Fix:
+
+tar -xzvf backup.tar.gz -C /opt/restore
+
+❌ Issue 4: tar command shows “Cannot remove existing file”
+
+Fix: Overwrite with --overwrite
+
+tar --overwrite -xvf backup.tar
+
+🎯 INTERVIEW QUESTIONS Based on Real Scenarios
+Q1. How do you transfer files between two servers securely?
+
+Answer:
+Use scp or rsync:
+
+scp file user@server:/path
+
+Or:
+
+rsync -avz file user@server:/path
+
+Q2: What’s the difference between scp and rsync?
+
+Answer:
+scp	rsync
+Copies entire file every time	Copies only changed blocks
+No resume support	Resume supported (-P)
+Slower	Faster, efficient
+
+Q3: How do you compress multiple folders?
+tar -czvf project.tar.gz dir1 dir2 dir3
+
+Q4: How do you check the contents of a tar file without extracting it?
+tar -tvf archive.tar.gz
+
+Q5: How do you move 100GB file across slow network?
+
+Use rsync with resume:
+
+rsync -avzP bigfile.iso user@server:/backup/
